@@ -1,2 +1,6 @@
 .ipynb_checkpoints/
+venv/
 images/
+data/
+
+secret.yaml
