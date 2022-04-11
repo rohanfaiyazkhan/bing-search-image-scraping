@@ -28,4 +28,4 @@ instance = ImageSearch(DEFAULT_SECRET_PATH, OUTPUT_DIRECTORY)
 instance.search_and_download_into_folder("search_query", max_images=150, page=1)
 ```
 
-By default `DEFAULT_SECRET_PATH` is `secret.toml` and `OUTPUT_DIRECTORY` is `data`. Data will get downloaded as `count.jpg`.
+By default `DEFAULT_SECRET_PATH` is `secret.toml` and `OUTPUT_DIRECTORY` is `data`. Data will get downloaded as `count.jpg`
