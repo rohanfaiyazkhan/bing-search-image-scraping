@@ -1,17 +1,39 @@
 from unittest.mock import DEFAULT
+from urllib.error import HTTPError
 import requests
 from fastcore.foundation import L
-from fastdownload import download_url
 from pathlib import Path
-from get_key import get_key
+import yaml
 
 BING_IMAGE_API_URL = "https://api.bing.microsoft.com/v7.0/images/search"
 DEFAULT_SECRET_PATH = "secret.yaml"
 
+def get_key(path="secret.yaml") -> str:
+    with open(path, "r") as stream:
+        try:
+            contents = yaml.safe_load(stream)
+            
+            if contents["azure_secret_key"] is None:
+                raise KeyError("azure_secret_key could not be found")
+
+            return contents["azure_secret_key"]
+        except KeyError as e:
+            raise KeyError(e)
+
+def download_url(url, path):
+    response = requests.get(url, allow_redirects=True)
+    response.raise_for_status()
+
+    with open(path, 'wb') as w:
+        w.write(response.content)
+        
+
 def download_to_directory(index, url, output=Path('../data')):
     path = output / f'{index}.jpg'
+
     download_url(url, path)
-    print(f'Downloaded {url} as {path}')
+
+
 
 def search_images(key, term, min_sz=128, max_images=150, page=1):
     offset = (page - 1) * max_images
@@ -40,7 +62,7 @@ def search_and_download(key, query, output_dir, page=1, max_images=150):
         for idx, url in enumerate(ims):
             try:
                 download_to_directory(idx + offset, url, output_dir)
-            except Exception as e:
+            except requests.exceptions.HTTPError as e:
                 print(f'Unable to save {url}')
                 print(e)
     else:
